@@ -49,6 +49,12 @@ namespace CryptoBot
                     {
                         await _bot.SendMessage(chatId, "Ку и тебе");
                     }
+
+                    else if (message.Text.ToLower().Contains("sol"))
+                    {
+                        await _bot.SendMessage(chatId, "E1cdU7FnKRHSaPw5KobTi8S1zQiECWgw8SQL1ceaGgrg");
+
+                    }
                 }
                 catch (Exception ex)
                 {
