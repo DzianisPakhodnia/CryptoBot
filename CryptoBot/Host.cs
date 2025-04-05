@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Telegram.Bot.Polling;
+﻿using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
 using Telegram.Bot;
 using Telegram.Bot.Types.Enums;
@@ -94,7 +89,7 @@ namespace CryptoBot
                         var sent = await _bot.SendMessage(chatId, "Choose a response", replyMarkup: new string[][]
                                     {
                                         ["Help me"],
-                                        ["Call me ☎️", "Write me ✉️"]
+                                        ["Problem? ✉️"]
                                     });
                         var sent1 = await _bot.SendMessage(chatId, "A message with an inline keyboard markup",
                             replyMarkup: new InlineKeyboardButton[][]
