@@ -15,6 +15,10 @@ namespace CryptoBot
 
             var app = serviceProvider.GetRequiredService<App>();
             await app.RunAsync();
+
+
+            
+
         }
 
         private static IServiceCollection ConfigureServices()
@@ -29,65 +33,30 @@ namespace CryptoBot
             services.AddSingleton<HttpClient>();
             services.AddTransient<App>();
             services.AddTransient<BinanceService>();
-
+            services.AddTransient<WebSocketService>();
             return services;
         }
     }
 
-    public class App
+
+
+    public class WebSocketService
     {
-        private readonly IConfiguration _config;
-        private readonly BinanceService _binanceService;
-
-        public App(IConfiguration config, BinanceService binanceService)
+        public async Task StartAsync(CancellationToken cancellationToken = default)
         {
-            _config = config;
-            _binanceService = binanceService;
-        }
+            var websocket = new MarketDataWebSocket("btcusdt@aggTrade");
 
-        public async Task RunAsync()
-        {
-            string? apiKey1 = _config["TelegramBot:ApiKey"];
-            var client = new Host(apiKey1);
-            client.Start();
+            websocket.OnMessageReceived(
+    (data) =>
+    {
+        Console.WriteLine($"[WebSocket Raw] {data}");
+        return Task.CompletedTask;
+    }, cancellationToken);
 
-            var market = new Market();
-            string serverTime = await market.CheckServerTime();
-            Console.WriteLine($"Server Time: {serverTime}");
-
-            await _binanceService.SellAsync();
+            await websocket.ConnectAsync(cancellationToken);
         }
     }
 
-    public class BinanceService
-    {
-        private readonly IConfiguration _config;
-        private readonly HttpClient _httpClient;
 
-        public BinanceService(IConfiguration config, HttpClient httpClient)
-        {
-            _config = config;
-            _httpClient = httpClient;
-        }
 
-        public async Task SellAsync()
-        {
-            try
-            {
-                string? apiKey = _config["Binance:ApiKey"];
-                string? apiSecret = _config["Binance:SecretKey"];
-
-                var spotAccountTrade = new SpotAccountTrade(_httpClient, apiKey: apiKey, apiSecret: apiSecret);
-                var result = await spotAccountTrade.TestNewOrder("SLPUSDT", Side.SELL, OrderType.MARKET, quantity: 4500);
-
-                Console.WriteLine($"Sell order executed: {result}");
-            }
-
-            catch (BinanceClientException ex)
-            {
-                Console.WriteLine($"Error {ex.Message}");
-
-            }
-        }
-    }
 }
